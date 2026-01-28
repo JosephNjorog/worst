@@ -24,8 +24,12 @@ export default async function EpisodesPage() {
               key={episode.id}
               className="group bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-8 items-start"
             >
-              <div className="w-full md:w-48 aspect-square bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
-                <Mic2 className="w-12 h-12" />
+              <div className="w-full md:w-48 aspect-square bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shrink-0 overflow-hidden border border-gray-100">
+                {episode.thumbnail_url ? (
+                  <img src={episode.thumbnail_url} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                ) : (
+                  <Mic2 className="w-12 h-12" />
+                )}
               </div>
               
               <div className="flex-1">

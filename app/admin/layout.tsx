@@ -20,35 +20,46 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-gray-50 flex">
       <SessionHandler />
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-8">Admin Panel</h2>
-          <nav className="space-y-2">
-            <Link href="/admin" className="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-              Dashboard
-            </Link>
-            <Link href="/admin/episodes" className="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-              Episodes
-            </Link>
-            <Link href="/admin/applications" className="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-              Applications
-            </Link>
-            <Link href="/admin/socials" className="block px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-              Social Links
-            </Link>
+      <aside className="w-72 bg-white border-r border-gray-200 flex flex-col sticky top-0 h-screen">
+        <div className="p-8">
+          <Link href="/" className="text-2xl font-black tracking-tighter text-blue-600 mb-10 block">
+            WORST FRIENDS
+          </Link>
+          
+          <nav className="space-y-1">
+            {[
+              { name: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
+              { name: 'Episodes', href: '/admin/episodes', icon: 'Mic2' },
+              { name: 'Applications', href: '/admin/applications', icon: 'FileText' },
+              { name: 'Social Links', href: '/admin/socials', icon: 'Share2' },
+            ].map((item) => (
+              <Link 
+                key={item.href}
+                href={item.href} 
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-semibold hover:bg-blue-50 hover:text-blue-600 transition-all"
+              >
+                {item.name}
+              </Link>
+            ))}
           </nav>
         </div>
         
-        <div className="mt-auto p-6 border-t border-gray-200">
-          <div className="mb-4">
-            <p className="text-xs text-gray-500 truncate">{user.email}</p>
+        <div className="mt-auto p-8 border-t border-gray-100 bg-gray-50/50">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+              {user.email?.[0].toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-gray-900 truncate">{user.email}</p>
+              <p className="text-xs text-gray-500">Administrator</p>
+            </div>
           </div>
           <LogoutButton />
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-10 overflow-auto">
         {children}
       </main>
     </div>
