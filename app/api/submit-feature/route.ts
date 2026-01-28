@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     // Send email using Nodemailer
     try {
       await sendEmail({
-        to: process.env.ADMIN_EMAIL || 'podcast@example.com', // Replace with actual podcast email or env var
+        to: 'worstfriendspodcast1@gmail.com', // Updated to the correct podcast email
         subject: `New Feature Application: ${name}`,
         replyTo: email,
         html: `
@@ -38,6 +38,8 @@ export async function POST(request: Request) {
           <p><strong>Email:</strong> ${email}</p>
           <p><strong>Feature Description:</strong></p>
           <p>${featureDescription}</p>
+          <hr />
+          <p><small>Note: Applicant has been instructed to send their portfolio and 2-min intro video to this email address as well.</small></p>
         `,
       });
     } catch (mailError) {

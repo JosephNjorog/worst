@@ -37,7 +37,7 @@ export default function FeatureApplicationForm() {
     <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4 max-w-2xl">
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <h2 className="text-3xl font-bold mb-6 text-center">Apply to be Featured</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">Apply to be Featured</h2>
           <p className="text-gray-600 mb-8 text-center">
             Have a cool feature or project? Tell us about it and get featured on our podcast.
           </p>

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import LogoutButton from '@/components/admin/LogoutButton';
+import SessionHandler from '@/components/admin/SessionHandler';
 
 export default async function AdminLayout({
   children,
@@ -17,6 +18,7 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
+      <SessionHandler />
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-6">
