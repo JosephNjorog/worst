@@ -5,27 +5,20 @@ import Link from 'next/link';
 import { PlayCircle, Mic2, Users, Sparkles, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
 
 export default function Hero() {
   const [clickCount, setClickCount] = useState(0);
-  const [showFeedback, setShowFeedback] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (clickCount > 0) {
-      setShowFeedback(true);
-      // Keep feedback visible slightly longer for mobile users to notice
-      const feedbackTimer = setTimeout(() => setShowFeedback(false), 2000);
-      
       if (clickCount === 5) {
         router.push('/login');
         setClickCount(0);
       }
       
-      const resetTimer = setTimeout(() => setClickCount(0), 4000);
+      const resetTimer = setTimeout(() => setClickCount(0), 3000);
       return () => {
-        clearTimeout(feedbackTimer);
         clearTimeout(resetTimer);
       };
     }
@@ -33,27 +26,6 @@ export default function Hero() {
 
   return (
     <section className="relative w-full py-20 lg:py-32 overflow-hidden bg-white">
-      {/* Admin Trigger Feedback - Optimized for Mobile */}
-      <AnimatePresence>
-        {showFeedback && clickCount > 0 && (
-          <motion.div 
-            initial={{ opacity: 0, y: -50, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: -50, x: '-50%' }}
-            className="fixed top-24 left-1/2 z-[100] pointer-events-none w-auto"
-          >
-            <motion.div 
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 0.2 }}
-              className="bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-bold flex items-center gap-3 shadow-2xl border border-white/20 whitespace-nowrap"
-            >
-              <Lock className="w-4 h-4 text-blue-400" />
-              <span>Admin Access: <span className="text-blue-400 text-lg">{clickCount}</span>/5</span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <motion.div
@@ -67,15 +39,8 @@ export default function Hero() {
             </div>
             <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-6 leading-[1.1] text-gray-900">
               The Podcast for <span 
-                className={cn(
-                  "text-blue-600 cursor-pointer select-none transition-all duration-200 inline-block active:scale-95",
-                  clickCount > 0 && "scale-110 rotate-2"
-                )}
+                className="text-blue-600 cursor-default select-none"
                 onClick={() => setClickCount(prev => prev + 1)}
-                onTouchStart={(e) => {
-                  // Prevent double-triggering on some mobile browsers
-                  // but allow the click event to proceed
-                }}
               >Worst</span> Friends & Best Stories
             </h1>
             <p className="text-xl text-gray-600 mb-10 leading-relaxed max-w-xl">

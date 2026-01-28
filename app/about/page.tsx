@@ -1,77 +1,139 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Users, Heart, Coffee, Zap } from 'lucide-react';
+import { useState, useEffect, Suspense } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 
-export default function AboutPage() {
-  const supabase = await createClient();
-  const { data: episodes } = await supabase
-    .from('episodes')
-    .select('*')
-    .order('published_at', { ascending: false });
+function LoginForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const supabase = createClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const msg = searchParams.get('message');
+    const err = searchParams.get('error');
+    if (msg) setMessage(msg);
+    if (err) setError(err);
+  }, [searchParams]);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        router.push('/admin');
+      }
+    };
+    checkUser();
+  }, [router, supabase.auth]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+    } else {
+      router.push('/admin');
+      router.refresh();
+    }
+  };
 
   return (
-    <main className="min-h-screen bg-white py-20">
-      <div className="container mx-auto px-4">
-        <div className="max-w-2xl mb-16">
-          <h1 className="text-4xl lg:text-6xl font-bold mb-6 text-gray-900">Episodes</h1>
-          <p className="text-xl text-gray-600">
-            Catch up on all our past conversations. From the deep to the ridiculous.
-          </p>
-        </div>
-
-        <div className="grid gap-8">
-          {episodes?.map((episode) => (
-            <div 
-              key={episode.id}
-              className="group bg-white p-6 lg:p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row gap-8 items-start"
-            >
-              <div className="w-full md:w-48 aspect-square bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
-                <Mic2 className="w-12 h-12" />
-              </div>
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    {episode.published_at ? new Date(episode.published_at).toLocaleDateString() : 'Recently'}
-                  </div>
-                  <div className="w-1 h-1 bg-gray-300 rounded-full" />
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    45 min
-                  </div>
-                </div>
-                
-                <h2 className="text-2xl font-bold mb-4 text-gray-900 group-hover:text-blue-600 transition-colors">
-                  {episode.title}
-                </h2>
-                <p className="text-gray-600 mb-6 line-clamp-2">
-                  {episode.description}
-                </p>
-                
-                {episode.audio_url && (
-                  <a 
-                    href={episode.audio_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-blue-600 font-bold hover:gap-3 transition-all"
-                  >
-                    Listen to Episode
-                    <span className="text-xl">→</span>
-                  </a>
-                )}
-              </div>
-            </div>
-          ))}
-
-          {(!episodes || episodes.length === 0) && (
-            <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-              <p className="text-gray-500">No episodes published yet. Stay tuned!</p>
-            </div>
-          )}
-        </div>
+    <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
+        <p className="text-gray-500 text-sm mt-2">Sign in to manage your podcast</p>
       </div>
-    </main>
+      
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="email"
+              required
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@worstfriends.com"
+            />
+          </div>
+        </div>
+        <div>
+          <div className="flex justify-between items-center mb-1">
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <Link href="/forgot-password" className="text-xs text-blue-600 hover:underline">
+              Forgot password?
+            </Link>
+          </div>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+        
+        {message && (
+          <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-2">
+            <div className="w-1 h-full bg-blue-500 rounded-full" />
+            <p className="text-blue-700 text-sm font-medium">{message}</p>
+          </div>
+        )}
+        
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-100 rounded-lg flex items-center gap-2">
+            <div className="w-1 h-full bg-red-500 rounded-full" />
+            <p className="text-red-700 text-sm font-medium">{error}</p>
+          </div>
+        )}
+        
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm"
+        >
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <Suspense fallback={<div>Loading...</div>}>
+        <LoginForm />
+      </Suspense>
+    </div>
   );
 }
